@@ -1,7 +1,7 @@
-#Data Files 
-.csv
-.xlsx
-.gpx
+#Data Files
+*.csv
+*.xlsx
+*.gpx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
