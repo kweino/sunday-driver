@@ -6,6 +6,11 @@
 import scrapy
 
 
+class CommentItem(scrapy.Item):
+    route_name = scrapy.Field()
+    comments = scrapy.Field()
+
+
 class RouteScraperItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
