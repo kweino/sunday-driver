@@ -33,6 +33,7 @@ st.markdown('''
 with st.form(key='my_form'):
      user_address = st.text_input('Address')
      num_routes_desired = st.slider('How many suggested routes would you like?',1,10)
+     show_state_routes = st.checkbox("Show a map of all the routes in your state")
      submit_button = st.form_submit_button('Get Routes!')
 
 if submit_button:
@@ -42,7 +43,7 @@ if submit_button:
 
     if results:
         user_loc = Point(results[0]['geometry']['lng'],results[0]['geometry']['lat'] )
-        #user_state = results[0]['components']['state']
+        user_state = results[0]['components']['state']
 
         #fit model for number of user routes
         features, model = create_model(num_routes_desired)
@@ -72,26 +73,25 @@ if submit_button:
             col2.write(f'{rec_route.drive_enjoyment_description.values[0]}')
             col3.markdown('**Tourism:**')
             col3.write(f'{rec_route.tourism_description.values[0]}')
+
+        if show_state_routes:
+            st.subheader(f'Explore all the best motorcycle routes in {user_state}:')
+            MR_route_map = make_route_map(route_gdf,user_state)
+            st.plotly_chart(MR_route_map, use_container_width = True)
+
     else:
-        st.write('Unexpected error! Try your query again.')
+        st.write('**Unexpected error!** Try your query again.')
 
 
 st.header('The story behind Sunday Driver')
 
-with st.expander('Where are the good motorcycle roads?'):
-    st.markdown('''
-        **Map of MR.com routes** \n
-        Colors represent MR.com users\' ratings of each route
-    ''')
-    #st.image('roadsmap.png')
+with st.form(key='routes_form'):
+    st.write('Click this button to generate an interactive map of all the routes in this database')
+    sub_button = st.form_submit_button('See All Routes!')
 
-with st.form(key='get_route_map'):
-    sub_button = st.form_submit_button('Get Routes Map')
 if sub_button:
-    @st.cache()
-    def create_a_map():
+    with st.spinner('Generating map...'):
         MR_route_map = make_route_map(route_marks_df)
-        return MR_route_map
-    MR_route_map = create_a_map()
-    st.plotly_chart(MR_route_map)
+        st.plotly_chart(MR_route_map, use_container_width = True)
+
 st.balloons()

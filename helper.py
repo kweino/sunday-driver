@@ -52,7 +52,38 @@ def get_data(data_path):
     with gzip.open(data_path, 'rb') as f:
         return dill.load(f)
 
-def make_route_map(df):
-    fig = px.line_mapbox(df, lat='lat', lon='lon', hover_name='name',
-                         mapbox_style='open-street-map', zoom=2)
+def make_route_map(df,state=None):
+    if state:
+        geo_df = df[df.state == state].reset_index(drop=True)
+
+        lats = []
+        lons = []
+        names = []
+        states = []
+
+        for feature, name, state in zip(geo_df.geometry, geo_df.route_name, geo_df.state):
+            if isinstance(feature, shapely.geometry.linestring.LineString):
+                linestrings = [feature]
+            elif isinstance(feature, shapely.geometry.multilinestring.MultiLineString):
+                linestrings = feature.geoms
+            else:
+                continue
+            for linestring in linestrings:
+                x, y = linestring.xy
+                lats = np.append(lats, y)
+                lons = np.append(lons, x)
+                names = np.append(names, [name]*len(y))
+                states = np.append(states, [state]*len(y))
+                lats = np.append(lats, None)
+                lons = np.append(lons, None)
+                names = np.append(names, None)
+                states = np.append(states, None)
+
+        fig = px.line_mapbox(lat=lats, lon=lons, hover_name=names,
+                             mapbox_style="open-street-map", zoom=4)
+    else:
+        #For mapping all the routes in the database
+        geo_df = df
+        fig = px.line_mapbox(geo_df, lat='lat', lon='lon', hover_name='name',
+                     mapbox_style="open-street-map", zoom=2)
     return fig
