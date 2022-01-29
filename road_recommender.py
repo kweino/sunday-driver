@@ -24,7 +24,7 @@ def create_model(num_neighbors):
     """Return trained NN model"""
     num_neighbors = num_neighbors
 
-    numeric_features = ['route_length','state_prop_rank']#,'scenery_rating','drive_enjoyment_rating','tourism_rating']
+    numeric_features = ['route_length','state_prop_rank']
 
     # transformers
     numeric_transformer = Pipeline([
