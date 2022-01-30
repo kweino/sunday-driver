@@ -7,7 +7,6 @@ import numpy as np
 from gpx_converter import Converter
 from os.path import exists as file_exists
 import plotly.express as px
-import geopandas as gpd
 import shapely.geometry
 import streamlit as st
 
@@ -52,3 +51,8 @@ def get_data(data_path):
     """Return loaded data from disk."""
     with gzip.open(data_path, 'rb') as f:
         return dill.load(f)
+
+def write_data(data, data_path):
+    '''Write data to disk'''
+    with gzip.open(data_path, 'wb') as f:
+        dill.dump(data, f)

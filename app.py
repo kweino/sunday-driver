@@ -8,9 +8,10 @@ from shapely.geometry import Point
 import plotly.express as px
 
 from road_recommender import create_model, get_recommendations
-from helper import get_route_coords, get_data
+from comment_modeler import create_comment_model, get_main_topic_df
+from helper import get_route_coords, get_data, write_data
 
-##### Data, Variables, Configurations #####
+##### Data, Variables, Models #####
 config = dotenv_values(".env")
 geocode_key = config['GEOCODE-API-KEY']
 
@@ -18,9 +19,15 @@ df = get_data('data/route_df.pkl')
 route_gdf = get_data('data/route_gdf.pkl')
 route_marks_long = get_data('data/route_marks_long.pkl')
 
+lda_model = get_data('data/models/lda_model.dill.gz')
+dictionary = get_data('data/models/dictionary.dill.gz')
+corpus = get_data('data/models/corpus.dill.gz')
+processed_text = get_data('data/models/processed_text.dill.gz')
+
+##### Configurations #####
 st.set_page_config(layout="wide")
 
-##### Functions #####
+##### Functions to display various page elements #####
 def display_route_info(rec_route,gpx):
 
     st.subheader(rec_route.name.values[0])
@@ -103,6 +110,28 @@ def make_big_map(df,state=None):
 
     # fig.update_geos(fitbounds="locations")
     return fig
+
+def plot_topic_wordfreqs(lda_model, dictionary, corpus, processed_text):
+    main_topic_df = get_main_topic_df(lda_model, corpus, processed_text)
+    lda_top_words_index = set()
+    for i in range(lda_model.num_topics):
+        lda_top_words_index = lda_top_words_index.union([k for (k,v) in lda_model.get_topic_terms(i)])
+
+    #print('Indices of top words: \n{}\n'.format(lda_top_words_index))
+    words_we_care_about = [{dictionary[tup[0]]: tup[1] for tup in lst if tup[0] in lda_top_words_index}
+                           for lst in corpus]
+    lda_top_words_df = pd.DataFrame(words_we_care_about).fillna(0).astype(int).sort_index(axis=1)
+    lda_top_words_df['Cluster'] = main_topic_df['Dominant_topic']
+    word_freq_plot = (
+            lda_top_words_df
+            .groupby('Cluster').sum().transpose()
+            .plot.bar(figsize=(15, 5), width=0.7)
+            .set(ylabel='Word frequency',
+                 title=f'Word Frequencies by Topic, Combining the Top {len(lda_top_words_index)} Words in Each Topic')
+    )
+    return word_freq_plot
+
+############################# START OF PAGE #############################
 
 ##### SIDEBAR FEATURES #####
 with st.sidebar.form(key='route_rec_form'):
@@ -204,20 +233,37 @@ elif data_story_button:
 
     st.markdown('''
         My first model attempted to learn something about the website features by
-        trying to predict the user rating for each route, based
-        on a variety of features I scraped from MR.com
+        trying to predict the current average user rating for each route. The model
+        included the features I scraped from MR.com as well as several custom features,
+        including the route's sinuosity and distance from a national park site.
 
-        I think the poor performance of the model is mostly due to the clustering
-        of user ratings. This makes sense since the routes on the site are user-generated
-        by a community avid motorcyclists.
+        In the end, the initial Ridge model only explained about 50-60% of the variance in
+        user ratings. I think the poor performance of the model can be explained by
+        two factors:
 
-        Topic modeling of the route comments
+        1. **The clustering of of user ratings:** The distribution of user ratings is
+        negatively skewed, which generates interesting interactions between different features
+        ''')
+
+
+    st.markdown('''
+        2. Qualitative differences: The best-performing features in the model were text descriptions of
+        each route's scenery, drive enjoyment, and tourism opportunities.
+
+        These factors make sense when one considers the community of users on the site.
+        Most of them are
+        Prominent topics in the route comments included X Y and Z...
     ''')
+    word_freq_plot = plot_topic_wordfreqs(lda_model, dictionary, corpus, processed_text)
+    st.pyplot(word_freq_plot)
     st.image('data/roadsmap.png') # map of all the roads, colored by user rating
 
     st.markdown('''
-        The recommendation engine ...
+        The recommendation engine provides a great way to access the routes wherever
+        you happen to be. The app geocaches the user's location and returns the closest
+        route plus all of the recommended routes like the closest route.
     ''')
+
 ##### LANDING PAGE #####
 else: #not (route_rec_button) or (all_routes_button) or (data_story_button):
     st.title('Sunday Driver: A Motorcycle Road Recommendation Engine')

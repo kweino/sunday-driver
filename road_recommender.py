@@ -22,7 +22,6 @@ df = pd.read_csv(file_path)
 
 def create_model(num_neighbors):
     """Return trained NN model"""
-    num_neighbors = num_neighbors
 
     numeric_features = ['route_length','state_prop_rank']
 
@@ -63,20 +62,5 @@ def get_recommendations(features, model,route_index):
     return rec_routes
 
 
-def preserve_model(model, path_name=None):
-    """Preserve ML model to disk using dill."""
-    if path_name is None:
-        path_name = os.path.join('fraud_detection', 'model',
-                                 'ml_model.dill.gz')
-    with gzip.open(path_name, 'wb') as f:
-        dill.dump(model, f)
-
-
-def deploy_model(model_path):
-    """Return loaded ML model from disk."""
-    with gzip.open(model_path, 'rb') as f:
-        return dill.load(f)
-
 if __name__ == '__main__':
-    model = create_model()
-    preserve_model(model)
+    create_model()
