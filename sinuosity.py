@@ -32,4 +32,3 @@ def sinuosity_classifier(sinuosity):
 
 # sinuosity = calcluate_sinuosity(gpx_array)
 # print(sinuosity_classifier(sinuosity))
-
