@@ -156,8 +156,10 @@ if route_rec_button:
         user_loc = Point(results[0]['geometry']['lng'],results[0]['geometry']['lat'] )
         user_state = results[0]['components']['state']
 
+######## IS THIS SUPPOSED TO BE HERE?????
         #fit model for number of user routes
         features, model = create_model(num_routes_desired)
+########
 
         # find MR road closest to user Location
         closest_gpx =  (
@@ -216,7 +218,7 @@ elif data_story_button:
         that aren't already on the site, and  they can even find information about
         motorcycle clubs and places to hang out. Bill Belei, the site's founder,
         [started the site because he too was challenged](https://www.motorcycleroads.com/about-us)
-        by the task of finding a great place to ride a motorcyle.
+        by the task of finding a great place to ride a motorcycle.
     ''')
     col2.image('data/bike_rect.jpeg') #Me on the motorcycle
 
@@ -231,38 +233,66 @@ elif data_story_button:
     video_bytes = video_file.read()
     st.video(video_bytes)
 
-    st.markdown('''
-        My first model attempted to learn something about the website features by
-        trying to predict the current average user rating for each route. The model
-        included the features I scraped from MR.com as well as several custom features,
-        including the route's sinuosity and distance from a national park site.
+    st.header('Analysis Steps:')
+    with st.expander('Initial Ridge Model'):
+        st.markdown('''
+            In my first model, I wanted to learn something about the website features of each route.
+            Since explicability of features was my main focus, I chose a simple ridge regression model that
+            predicted the current average user rating for each route. The Ridge-Regression model
+            included the features I scraped from MR.com as well as several custom features,
+            including the route's sinuosity and distance from a national park site.
+            ''')
 
-        In the end, the initial Ridge model only explained about 50-60% of the variance in
-        user ratings. I think the poor performance of the model can be explained by
-        two factors:
+        col1, col2 = st.columns(2)
+        col1.markdown('''
+            In the end, the initial Ridge model only explained about 20-30% of the variance in
+            user ratings, and the model suffered from severe overfitting with the inclusion of any text data.
+            I think the poor performance of the model can be mostly attributed to the clustering of user ratings.
 
-        1. **The clustering of of user ratings:** The distribution of user ratings is
-        negatively skewed, which generates interesting interactions between different features
+            The distribution of user ratings is negatively skewed and generates
+            interesting interactions between different features, as shown by the charts on the right.
+            ''')
+        col2.image('data/user_rating_clusters.png')
+        st.markdown('''
+            The clustering is likely due to sampling bias in the data, especially given the following:
+            - The community of users on the site are all riders themselves (or are at least interested in the roads)
+            - The premise of the social network is to share great roads for motorcycles
         ''')
 
+    with st.expander('Exploring Qualitative Differences Between Routes'):
+        st.markdown('''
+            The best-performing features in the ridge model were text descriptions of
+            each route's scenery, drive enjoyment, and tourism opportunities. So,
+            I did some topic modeling with a nearest neighbors algorithm to look for
+            underlying themes in the data.
 
-    st.markdown('''
-        2. Qualitative differences: The best-performing features in the model were text descriptions of
-        each route's scenery, drive enjoyment, and tourism opportunities.
+            The top unigrams in user comments include *scenery*, *curves*, *beautiful*, *fun*, and *traffic*,
+            similar to themes in the route descriptions.
+        ''')
+        st.image('data/comments_top_unigrams.png')
+        st.markdown('''
+            When looking only at bigrams and trigrams in the comments, the resulting
+        ''')
 
-        These factors make sense when one considers the community of users on the site.
-        Most of them are
-        Prominent topics in the route comments included X Y and Z...
-    ''')
-    word_freq_plot = plot_topic_wordfreqs(lda_model, dictionary, corpus, processed_text)
-    st.pyplot(word_freq_plot)
-    st.image('data/roadsmap.png') # map of all the roads, colored by user rating
+    with st.expander('A Localized Solution'):
+        st.image('data/roadsmap.png') # map of all the roads, colored by user rating
+        st.markdown('''
+            Given that the ridge model didn't perform as well as expected,
+            I decided to return to the original problem and reframe it in a more localized manner
+            in order to deliever an MVP for the project. Instead of trying find the best road,
+            I decided to try unsupervised methods to find and recommend routes from the database, based on user criteria.
 
-    st.markdown('''
-        The recommendation engine provides a great way to access the routes wherever
-        you happen to be. The app geocaches the user's location and returns the closest
-        route plus all of the recommended routes like the closest route.
-    ''')
+            I believe the resulting recommendation engine provides a great way to access the routes wherever
+            you happen to be. The app geocaches the user's location and returns the closest
+            route, and then recommended other routes similar to the closest route. The engine seems
+            to heavily favor the centroid location of each route, which helps keep
+            the route recommendations geographically closer to the user's location.
+
+            Next steps for the project include:
+            - Automating data retrieval to make sure I always get the latest routes added to the site.
+            - Trying to build features that better quantify the qualitative themes uncovered during topic modeling.
+            - Testing the recommendation engine with users.
+        ''')
 
 ##### LANDING PAGE #####
 else: #not (route_rec_button) or (all_routes_button) or (data_story_button):
@@ -270,10 +300,9 @@ else: #not (route_rec_button) or (all_routes_button) or (data_story_button):
     st.markdown('''
         **Sunday Driver** provides recommendations for roads near a user's location
         that are highly rated by motorcyclists. Just put an address in the
-        form to the left to find some new routes! Check out a sample of the route data below.
+        form to the left to find some new routes! You can see a sample of the route data below.
 
         ---
     ''')
     rand_route = df.sample(1)
-    #st.write(rand_route)
     display_route_info(rand_route, gpx=rand_route.gpx_file_num.values[0])
