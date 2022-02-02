@@ -60,10 +60,9 @@ def display_route_info(rec_route,gpx):
 
     # route map
     fig = px.line_mapbox(get_route_coords(gpx), lat="latitude", lon="longitude",
-                         mapbox_style='open-street-map', mapbox_accesstoken=st.secrets.MAPBOX_KEY,
                          height=500)
     fig.update_geos(fitbounds="locations")
-    fig.update_layout()
+    fig.update_layout(mapbox_style='open-street-map', mapbox_accesstoken=st.secrets.MAPBOX_KEY)
 
     st.plotly_chart(fig, use_container_width=True)
 
