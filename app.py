@@ -17,7 +17,7 @@ from helper import get_route_coords, get_data, write_data
 
 ##### Data, Variables, Models #####
 # config = dotenv_values(".env")
-geocode_key = st.secrets['GEOCODE_API_KEY']
+geocode_key = st.secrets.GEOCODE_API_KEY
 
 df = get_data('data/route_df.pkl')
 route_gdf = get_data('data/route_gdf.pkl')
@@ -62,6 +62,7 @@ def display_route_info(rec_route,gpx):
     fig = px.line_mapbox(get_route_coords(gpx), lat="latitude", lon="longitude",
                          mapbox_style='open-street-map',height=500)
     fig.update_geos(fitbounds="locations")
+    fig.update_layout(mapbox_accesstoken=st.secrets.MAPBOX_KEY)
 
     st.plotly_chart(fig, use_container_width=True)
 
