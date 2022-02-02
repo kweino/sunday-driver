@@ -5,6 +5,7 @@
 *.mp4
 videos/
 secrets.toml
+config.toml
 requirements-local.txt
 
 # Byte-compiled / optimized / DLL files

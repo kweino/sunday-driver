@@ -17,7 +17,7 @@ from helper import get_route_coords, get_data, write_data
 
 ##### Data, Variables, Models #####
 # config = dotenv_values(".env")
-geocode_key = st.secrets['GEOCODE-API-KEY']
+geocode_key = st.secrets['GEOCODE_API_KEY']
 
 df = get_data('data/route_df.pkl')
 route_gdf = get_data('data/route_gdf.pkl')
