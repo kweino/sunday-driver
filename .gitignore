@@ -4,6 +4,8 @@
 *.gpx
 *.mp4
 videos/
+secrets.toml
+requirements-local.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

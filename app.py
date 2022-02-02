@@ -11,13 +11,13 @@ from road_recommender import create_model, get_recommendations
 from comment_modeler import create_comment_model, get_main_topic_df
 from helper import get_route_coords, get_data, write_data
 
-from boto.s3.connection import S3Connection
-
-s3 = S3Connection(os.environ['GEOCODE-API-KEY'])
+# from boto.s3.connection import S3Connection
+#
+# s3 = S3Connection(os.environ['GEOCODE-API-KEY'])
 
 ##### Data, Variables, Models #####
-config = dotenv_values(".env")
-geocode_key = s3
+# config = dotenv_values(".env")
+geocode_key = st.secrets['GEOCODE-API-KEY']
 
 df = get_data('data/route_df.pkl')
 route_gdf = get_data('data/route_gdf.pkl')
