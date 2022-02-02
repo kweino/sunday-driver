@@ -1,6 +1,7 @@
 #Data Files
 *.csv
 *.xlsx
+*.gpx
 videos/
 secrets.toml
 config.toml
