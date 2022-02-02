@@ -14,11 +14,12 @@ from sklearn.preprocessing import FunctionTransformer, RobustScaler, OneHotEncod
 from spacy.lang.en.stop_words import STOP_WORDS
 STOP_WORDS = STOP_WORDS.union({'ll', 've', 'pron'})
 
-from helper import calc_row_sum
+from helper import calc_row_sum, get_data
 
 # read in data
-file_path = os.path.join('data', 'MR_Route_Data.csv')
-df = pd.read_csv(file_path)
+# file_path = os.path.join('data', 'MR_Route_Data.csv')
+# df = pd.read_csv(file_path)
+df = get_data('data/route_df.pkl')
 
 def create_model(num_neighbors):
     """Return trained NN model"""
