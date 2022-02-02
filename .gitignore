@@ -2,7 +2,6 @@
 *.csv
 *.xlsx
 *.gpx
-*.mp4
 videos/
 secrets.toml
 config.toml
