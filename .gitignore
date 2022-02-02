@@ -3,6 +3,7 @@
 *.xlsx
 *.gpx
 *.mp4
+videos/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
