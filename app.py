@@ -9,7 +9,7 @@ import plotly.express as px
 
 from road_recommender import create_model, get_recommendations
 from comment_modeler import create_comment_model, get_main_topic_df
-from helper import get_route_coords, get_data, write_data
+from helper import get_data, write_data#, get_route_coords
 
 # from boto.s3.connection import S3Connection
 #
@@ -32,6 +32,12 @@ processed_text = get_data('data/models/processed_text.dill.gz')
 st.set_page_config(layout="wide")
 
 ##### Functions to display various page elements #####
+
+def get_route_coords(gpx_file_num):
+    '''takes a gpx_file_num and returns a dataframe of the lat/lon points'''
+    x,y = route_gdf[route_gdf.gpx_file_num == gpx_file_num].geometry.iloc[0].coords.xy
+    return pd.DataFrame({'latitude':y,'longitude':x})
+
 def display_route_info(rec_route,gpx):
 
     st.subheader(rec_route.name.values[0])
@@ -234,7 +240,7 @@ elif data_story_button:
         and descriptions, route ranking stats, comments users made, and attched GPX files
         (XML files full of route lat/lon tuples) for each of the {len(df)} routes currently on MR.com.
     ''')
-    video_file = open('videos/MRcom_page.mp4', 'rb')
+    video_file = open('data/MRcom_page.mp4', 'rb')
     video_bytes = video_file.read()
     st.video(video_bytes)
 
@@ -256,12 +262,13 @@ elif data_story_button:
 
             The distribution of user ratings is negatively skewed and generates
             interesting interactions between different features, as shown by the charts on the right.
-            ''')
-        col2.image('data/user_rating_clusters.png')
-        st.markdown('''
+
             The clustering is likely due to sampling bias in the data, especially given the following:
             - The community of users on the site are all riders themselves (or are at least interested in the roads)
             - The premise of the social network is to share great roads for motorcycles
+            ''')
+        col2.image('data/user_rating_clusters.png')
+        st.markdown('''
         ''')
 
     with st.expander('Exploring Qualitative Differences Between Routes'):
