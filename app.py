@@ -9,7 +9,7 @@ import plotly.express as px
 
 from road_recommender import create_model, get_recommendations
 from comment_modeler import create_comment_model, get_main_topic_df
-from helper import get_data, write_data
+from helper import get_data, write_data, get_plotting_zoom_level_and_center_coordinates_from_lonlat_tuples
 
 
 
@@ -63,11 +63,16 @@ def display_route_info(rec_route,gpx):
     st.write('(Route metrics compared to database median values)')
 
     # route map
-    fig = px.line_mapbox(get_route_coords(gpx), lat="latitude", lon="longitude",
-                         color_discrete_sequence=['RoyalBlue'],height=500)
+    map_coords = get_route_coords(gpx)
+    # map_zoom, map_center = get_plotting_zoom_level_and_center_coordinates_from_lonlat_tuples(longitudes=map_coords.longitude, latitudes=map_coords.latitude)
+    fig = px.line_mapbox(map_coords, lat="latitude", lon="longitude",
+                         color_discrete_sequence=['RoyalBlue'],
+                         zoom=8,
+                         # center={'lon':map_center[0],'lat':map_center[1]},
+                         height=500)
     fig.update_traces(line={'width':4})
     # fig.update_geos(fitbounds="locations")
-    fig.update_layout(mapbox_style='dark', mapbox_accesstoken=st.secrets.MAPBOX_KEY)
+    fig.update_layout(mapbox_style='streets', mapbox_accesstoken=st.secrets.MAPBOX_KEY)
 
     st.plotly_chart(fig, use_container_width=True)
 
@@ -166,10 +171,10 @@ if route_rec_button:
         user_loc = Point(results[0]['geometry']['lng'],results[0]['geometry']['lat'] )
         user_state = results[0]['components']['state']
 
-######## IS THIS SUPPOSED TO BE HERE?????
+
         #fit model for number of user routes
         features, model = create_model(num_routes_desired)
-########
+
 
         # find MR road closest to user Location
         closest_gpx =  (
