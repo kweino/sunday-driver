@@ -9,14 +9,12 @@ import plotly.express as px
 
 from road_recommender import create_model, get_recommendations
 from comment_modeler import create_comment_model, get_main_topic_df
-from helper import get_data, write_data#, get_route_coords
+from helper import get_data, write_data
 
-# from boto.s3.connection import S3Connection
-#
-# s3 = S3Connection(os.environ['GEOCODE-API-KEY'])
+
 
 ##### Data, Variables, Models #####
-# config = dotenv_values(".env")
+
 geocode_key = st.secrets.GEOCODE_API_KEY
 
 df = get_data('data/route_df.pkl')
@@ -66,9 +64,10 @@ def display_route_info(rec_route,gpx):
 
     # route map
     fig = px.line_mapbox(get_route_coords(gpx), lat="latitude", lon="longitude",
-                         height=500)
-    fig.update_geos(fitbounds="locations")
-    fig.update_layout(mapbox_style='open-street-map', mapbox_accesstoken=st.secrets.MAPBOX_KEY)
+                         color_discrete_sequence=['RoyalBlue'],height=500)
+    fig.update_traces(line={'width':4})
+    # fig.update_geos(fitbounds="locations")
+    fig.update_layout(mapbox_style='dark', mapbox_accesstoken=st.secrets.MAPBOX_KEY)
 
     st.plotly_chart(fig, use_container_width=True)
 
