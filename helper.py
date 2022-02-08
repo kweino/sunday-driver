@@ -37,17 +37,6 @@ def calcluate_sinuosity(gpx_file_num):
 def calc_row_sum(cols):
     return pd.DataFrame(cols.apply(lambda x: x.sum(), axis=1))
 
-def get_route_coords(gpx_file_num):
-    # '''takes a gpx_file_num and returns a dataframe of the lat/lon points'''
-    # x,y = route_gdf[route_gdf.gpx_file_num == gpx_file_num].geometry.iloc[0].coords.xy
-    # return pd.DataFrame({'latitude':y,'longitude':x})
-    gpx_file = f'gpx_files/{str(gpx_file_num)}.gpx'
-    if file_exists(gpx_file):
-        try:
-            gpx_df = Converter(input_file=gpx_file).gpx_to_dataframe()
-            return gpx_df
-        except Exception:
-            return None
 
 def get_data(data_path):
     """Return loaded data from disk."""
