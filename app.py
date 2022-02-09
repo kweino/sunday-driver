@@ -98,7 +98,7 @@ def make_big_map(df,state=None):
         names = []
         states = []
 
-        for feature, name, state in zip(geo_df.geometry, geo_df.route_name, geo_df.state):
+        for feature, name, state in zip(geo_df.geometry, geo_df.name, geo_df.state):
             # if isinstance(feature, shapely.geometry.linestring.LineString):
             #     linestrings = [feature]
             # elif isinstance(feature, shapely.geometry.multilinestring.MultiLineString):
@@ -155,6 +155,7 @@ def plot_topic_wordfreqs(lda_model, dictionary, corpus, processed_text):
 with st.sidebar.form(key='route_rec_form'):
     user_address = st.text_input('Enter an address:')
     num_routes_desired = st.slider('How many suggested routes would you like?',1,10)
+    route_sinuosity = st.radio('How curvy should your routes be?', ["Doesn't matter",'Mostly Straight','Some twists and turns','Twisties all day!'])
     show_state_routes = st.checkbox("Show a map of all the routes in your state")
     route_rec_button = st.form_submit_button('Get Routes!')
 
@@ -178,13 +179,26 @@ if route_rec_button:
         #fit model for number of user routes
         features, model = create_model(num_routes_desired)
 
-
         # find MR road closest to user Location
+        if route_sinuosity == 'Mostly Straight':
+            curvy_gdf = route_gdf[route_gdf.sinuosity < 1.25]
+        elif route_sinuosity == 'Some twists and turns':
+            curvy_gdf = route_gdf[(route_gdf.sinuosity > 1.25) & (route_gdf.sinuosity < 1.25)]
+        elif route_sinuosity == 'Twisties all day!':
+            curvy_gdf = route_gdf[route_gdf.sinuosity > 1.5]
+        else:
+            curvy_gdf = route_gdf
+
         closest_gpx =  (
-            route_gdf
-            [route_gdf.rep_point.distance(user_loc) == route_gdf.rep_point.distance(user_loc).min()]
+            curvy_gdf
+            [curvy_gdf.rep_point.distance(user_loc) == curvy_gdf.rep_point.distance(user_loc).min()]
             .iloc[0].gpx_file_num
         )
+        # closest_gpx =  (
+        #     route_gdf
+        #     [route_gdf.rep_point.distance(user_loc) == route_gdf.rep_point.distance(user_loc).min()]
+        #     .iloc[0].gpx_file_num
+        # )
 
         closest_index = df[df.gpx_file_num == closest_gpx].index[0]
 
@@ -303,7 +317,7 @@ elif data_story_button:
 
             I believe the resulting recommendation engine provides a great way to access the routes wherever
             you happen to be. The app geocaches the user's location and returns the closest
-            route, and then recommended other routes similar to the closest route. The engine seems
+            route, and then recommends other routes similar to the closest route. The engine seems
             to heavily favor the centroid location of each route, which helps keep
             the route recommendations geographically closer to the user's location.
 
