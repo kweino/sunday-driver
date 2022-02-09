@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import pandas as pd
+import numpy as np
 from dotenv import dotenv_values
 from opencage.geocoder import OpenCageGeocode
 import geopandas
@@ -98,12 +99,14 @@ def make_big_map(df,state=None):
         states = []
 
         for feature, name, state in zip(geo_df.geometry, geo_df.route_name, geo_df.state):
-            if isinstance(feature, shapely.geometry.linestring.LineString):
-                linestrings = [feature]
-            elif isinstance(feature, shapely.geometry.multilinestring.MultiLineString):
-                linestrings = feature.geoms
-            else:
-                continue
+            # if isinstance(feature, shapely.geometry.linestring.LineString):
+            #     linestrings = [feature]
+            # elif isinstance(feature, shapely.geometry.multilinestring.MultiLineString):
+            #     linestrings = feature.geoms
+            # else:
+            #     continue
+            linestrings = [feature]
+
             for linestring in linestrings:
                 x, y = linestring.xy
                 lats = np.append(lats, y)
@@ -116,7 +119,7 @@ def make_big_map(df,state=None):
                 states = np.append(states, None)
 
         fig = px.line_mapbox(lat=lats, lon=lons, hover_name=names,
-                             mapbox_style="open-street-map", zoom=4)
+                             mapbox_style="open-street-map",height=600, zoom=5)
     else:
         #For mapping all the routes in the database
         geo_df = df
