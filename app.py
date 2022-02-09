@@ -243,7 +243,7 @@ elif data_story_button:
 
         So for this capstone project, I set out to create an app that would show me great
         roads to ride on my motorcycle, no matter where I was in the US. Think of it
-        as the 'motorcyle' travel mode button for Google Maps. But what exactly makes
+        as the 'motorcycle' travel mode button for Google Maps. But what exactly makes
         a road 'great' for motorcyclists? This capstone project centers around that question.
 
         To bring this question into the realm of data science, I searched the web
@@ -306,9 +306,9 @@ elif data_story_button:
             similar to themes in the route descriptions.
         ''')
         st.image('data/comments_top_unigrams.png')
-        st.markdown('''
-            When looking only at bigrams and trigrams in the comments, the resulting
-        ''')
+        # st.markdown('''
+        #     When looking only at bigrams and trigrams in the comments, the resulting
+        # ''')
 
     with st.expander('A Localized Solution'):
         st.image('data/roadsmap.png') # map of all the roads, colored by user rating
