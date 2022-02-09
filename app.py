@@ -155,7 +155,12 @@ def plot_topic_wordfreqs(lda_model, dictionary, corpus, processed_text):
 with st.sidebar.form(key='route_rec_form'):
     user_address = st.text_input('Enter an address:')
     num_routes_desired = st.slider('How many suggested routes would you like?',1,10)
-    route_sinuosity = st.radio('How curvy should your routes be?', ["Doesn't matter",'Mostly Straight','Some twists and turns','Twisties all day!'])
+    route_length_desired = st.number_input('Roughly how long of a ride do you want? \n (in miles)',
+                                            min_value=10,
+                                            max_value=round(route_gdf.route_length.max()),
+                                            value = 30,#round(route_gdf.route_length.median()),
+                                            step=10)
+    route_sinuosity_desired = st.radio('How curvy should your routes be?', ["Doesn't matter",'Mostly Straight','Some twists and turns','Twisties all day!'])
     show_state_routes = st.checkbox("Show a map of all the routes in your state")
     route_rec_button = st.form_submit_button('Get Routes!')
 
@@ -179,26 +184,24 @@ if route_rec_button:
         #fit model for number of user routes
         features, model = create_model(num_routes_desired)
 
-        # find MR road closest to user Location
-        if route_sinuosity == 'Mostly Straight':
-            curvy_gdf = route_gdf[route_gdf.sinuosity < 1.25]
-        elif route_sinuosity == 'Some twists and turns':
-            curvy_gdf = route_gdf[(route_gdf.sinuosity > 1.25) & (route_gdf.sinuosity < 1.25)]
-        elif route_sinuosity == 'Twisties all day!':
-            curvy_gdf = route_gdf[route_gdf.sinuosity > 1.5]
+
+        if route_sinuosity_desired == 'Mostly Straight':
+            curvy_gdf = route_gdf[(route_gdf.sinuosity < 1.25) & (route_gdf.route_length.between(route_length_desired-10,route_length_desired+10))]
+        elif route_sinuosity_desired == 'Some twists and turns':
+            curvy_gdf = route_gdf[(route_gdf.sinuosity > 1.25) & (route_gdf.sinuosity < 1.25)& (route_gdf.route_length.between(route_length_desired-10,route_length_desired+10))]
+        elif route_sinuosity_desired == 'Twisties all day!':
+            curvy_gdf = route_gdf[route_gdf.sinuosity > 1.5 & (route_gdf.route_length.between(route_length_desired-10,route_length_desired+10))]
         else:
             curvy_gdf = route_gdf
 
+        if len(curvy_gdf) == 0:
+            st.text('No roads in the database match your query. Please try again with different parameters.')
+        # find MR road closest to user Location
         closest_gpx =  (
             curvy_gdf
             [curvy_gdf.rep_point.distance(user_loc) == curvy_gdf.rep_point.distance(user_loc).min()]
             .iloc[0].gpx_file_num
         )
-        # closest_gpx =  (
-        #     route_gdf
-        #     [route_gdf.rep_point.distance(user_loc) == route_gdf.rep_point.distance(user_loc).min()]
-        #     .iloc[0].gpx_file_num
-        # )
 
         closest_index = df[df.gpx_file_num == closest_gpx].index[0]
 
