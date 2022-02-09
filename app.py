@@ -190,7 +190,7 @@ if route_rec_button:
         elif route_sinuosity_desired == 'Some twists and turns':
             curvy_gdf = route_gdf[(route_gdf.sinuosity > 1.25) & (route_gdf.sinuosity < 1.25)& (route_gdf.route_length.between(route_length_desired-10,route_length_desired+10))]
         elif route_sinuosity_desired == 'Twisties all day!':
-            curvy_gdf = route_gdf[route_gdf.sinuosity > 1.5 & (route_gdf.route_length.between(route_length_desired-10,route_length_desired+10))]
+            curvy_gdf = route_gdf[(route_gdf.sinuosity > 1.5) & (route_gdf.route_length.between(route_length_desired-10,route_length_desired+10))]
         else:
             curvy_gdf = route_gdf
 
