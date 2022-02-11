@@ -21,7 +21,7 @@ from helper import calc_row_sum, get_data
 # df = pd.read_csv(file_path)
 df = get_data('data/route_df.pkl')
 
-def create_model():
+def create_model(n_neighbors=5):
     """Return trained NN model"""
 
     numeric_features = ['route_length','state_prop_rank']
@@ -51,7 +51,7 @@ def create_model():
 
     engine_pipe = Pipeline([
         ('preprocessor', preprocessor),
-        ('nn', NearestNeighbors(n_neighbors=5)),#Nearest Neighbors
+        ('nn', NearestNeighbors(n_neighbors=n_neighbors)),#Nearest Neighbors
     ])
 
     return preprocessor.fit_transform(df), engine_pipe.fit(df)
