@@ -191,7 +191,7 @@ with st.sidebar.form(key='all_routes_form'):
     all_routes_button = st.form_submit_button('See All Routes!')
 
 with st.sidebar.form(key='data_story_form'):
-    st.write('Learn the story behind Sunday Driver')
+    st.write('Learn the story behind Sunday Rider')
     data_story_button = st.form_submit_button('Tell me more!')
 
 # st.title('LOOK HERE')
@@ -254,7 +254,7 @@ elif all_routes_button:
 
 ##### DATA STORY PAGE #####
 elif data_story_button:
-    st.title('The story of Sunday Driver')
+    st.title('The story of Sunday Rider')
     col1, col2 = st.columns(2)
     col1.markdown('''
         As an avid motorcyclist, I've always been frustrated by Google Maps any
@@ -366,9 +366,9 @@ elif st.session_state.click_route_button == True:
 
 ##### LANDING PAGE #####
 else: #not (route_rec_button) or (all_routes_button) or (data_story_button):
-    st.title('Sunday Driver: A Motorcycle Road Recommendation Engine')
+    st.title('Sunday Rider: A Motorcycle Road Recommendation Engine')
     st.markdown('''
-        **Sunday Driver** provides recommendations for roads near a user's location
+        **Sunday Rider** provides recommendations for roads near a user's location
         that are highly rated by motorcyclists. Just put an address in the
         form to the left to find some new routes! You can see a sample of the route data below.
 
