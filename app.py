@@ -26,6 +26,13 @@ lda_model = get_data('data/models/lda_model.dill.gz')
 dictionary = get_data('data/models/dictionary.dill.gz')
 corpus = get_data('data/models/corpus.dill.gz')
 processed_text = get_data('data/models/processed_text.dill.gz')
+features, model = create_model()
+
+if 'click_route_gpx' not in st.session_state:
+    st.session_state['click_route_gpx'] = 0
+
+if 'click_route_button' not in st.session_state:
+    st.session_state['click_route_button'] = False
 
 ##### Configurations #####
 st.set_page_config(layout="wide")
@@ -87,7 +94,22 @@ def display_route_info(rec_route,gpx):
         st.write(f'{rec_route.drive_enjoyment_description.values[0]}')
     with col3.expander('Tourism'):
         st.write(f'{rec_route.tourism_description.values[0]}')
+
+    def new_gpx():
+        nonlocal rec_route
+        st.session_state.click_route_button = True
+        st.session_state.click_route_gpx = rec_route.gpx_file_num.values[0]
+
+    st.markdown(f'''Like this route?''')
+    new_route_rec_button = st.button('See more routes like this one!',key=rec_route.name.values[0], on_click=new_gpx)
+
+    # st.markdown(f'''
+    #     Need Directions? Download the [GPX file](https://www.motorcycleroads.com/downloadgpx/{gpx}).
+    # ''')
     st.markdown('---')
+    # get new roads like the current one!
+    # if new_route_rec_button:
+    #     st.session_state.click_route_gpx = rec_route.name.values[0]
 
 def make_big_map(df,state=None):
     if state:
@@ -155,11 +177,11 @@ def plot_topic_wordfreqs(lda_model, dictionary, corpus, processed_text):
 with st.sidebar.form(key='route_rec_form'):
     user_address = st.text_input('Enter an address:')
     num_routes_desired = st.slider('How many suggested routes would you like?',1,10)
-    route_length_desired = st.number_input('Roughly how long of a ride do you want? \n (in miles)',
-                                            min_value=10,
-                                            max_value=round(route_gdf.route_length.max()),
-                                            value = 30,#round(route_gdf.route_length.median()),
-                                            step=10)
+    # route_length_desired = st.number_input('Roughly how long of a ride do you want? \n (in miles)',
+    #                                         min_value=10,
+    #                                         max_value=round(route_gdf.route_length.max()),
+    #                                         value = 30,#round(route_gdf.route_length.median()),
+    #                                         step=10)
     route_sinuosity_desired = st.radio('How curvy should your routes be?', ["Doesn't matter",'Mostly Straight','Some twists and turns','Twisties all day!'])
     show_state_routes = st.checkbox("Show a map of all the routes in your state")
     route_rec_button = st.form_submit_button('Get Routes!')
@@ -172,18 +194,18 @@ with st.sidebar.form(key='data_story_form'):
     st.write('Learn the story behind Sunday Driver')
     data_story_button = st.form_submit_button('Tell me more!')
 
+# st.title('LOOK HERE')
+# st.write(st.session_state.click_route_button, st.session_state.click_route_gpx)
+
+
 ##### ROUTE RECOMMENDER #####
 if route_rec_button:
     geocoder = OpenCageGeocode(geocode_key)
     results = geocoder.geocode(user_address)
+
     if results:
         user_loc = Point(results[0]['geometry']['lng'],results[0]['geometry']['lat'] )
         user_state = results[0]['components']['state']
-
-
-        #fit model for number of user routes
-        features, model = create_model(num_routes_desired)
-
 
         if route_sinuosity_desired == 'Mostly Straight':
             curvy_gdf = route_gdf[(route_gdf.sinuosity < 1.25) & (route_gdf.route_length.between(route_length_desired-10,route_length_desired+10))]
@@ -204,6 +226,7 @@ if route_rec_button:
         )
 
         closest_index = df[df.gpx_file_num == closest_gpx].index[0]
+
 
         # recommend routes from engine based on road MR found above
         recommended_roads = get_recommendations(features, model, closest_index)
@@ -329,6 +352,17 @@ elif data_story_button:
             - Trying to build features that better quantify the qualitative themes uncovered during topic modeling.
             - Testing the recommendation engine with users.
         ''')
+
+elif st.session_state.click_route_button == True:
+    # recommend routes from engine based on road MR found above
+    new_route_index = df[df.gpx_file_num == st.session_state.click_route_gpx].index[0]
+    recommended_roads = get_recommendations(features, model, new_route_index)
+
+    # map those roads
+    for gpx in recommended_roads.gpx_file_num:
+        new_rec_route = df[df.gpx_file_num == gpx]
+        display_route_info(new_rec_route,gpx)
+
 
 ##### LANDING PAGE #####
 else: #not (route_rec_button) or (all_routes_button) or (data_story_button):

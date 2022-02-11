@@ -6,6 +6,8 @@ videos/
 secrets.toml
 config.toml
 requirements-local.txt
+*.docx
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
