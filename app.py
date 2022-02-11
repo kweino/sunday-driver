@@ -366,6 +366,7 @@ elif st.session_state.click_route_button == True:
 
 ##### LANDING PAGE #####
 else: #not (route_rec_button) or (all_routes_button) or (data_story_button):
+    # st.write(route_gdf.route_length.sum()/2600000)
     st.title('Sunday Rider: A Motorcycle Road Recommendation Engine')
     st.markdown('''
         **Sunday Rider** provides recommendations for roads near a user's location
