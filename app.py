@@ -177,11 +177,11 @@ def plot_topic_wordfreqs(lda_model, dictionary, corpus, processed_text):
 with st.sidebar.form(key='route_rec_form'):
     user_address = st.text_input('Enter an address:')
     num_routes_desired = st.slider('How many suggested routes would you like?',1,10)
-    # route_length_desired = st.number_input('Roughly how long of a ride do you want? \n (in miles)',
-    #                                         min_value=10,
-    #                                         max_value=round(route_gdf.route_length.max()),
-    #                                         value = 30,#round(route_gdf.route_length.median()),
-    #                                         step=10)
+    route_length_desired = st.number_input('Roughly how long of a ride do you want? \n (in miles)',
+                                            min_value=10,
+                                            max_value=round(route_gdf.route_length.max()),
+                                            value = 30,#round(route_gdf.route_length.median()),
+                                            step=10)
     route_sinuosity_desired = st.radio('How curvy should your routes be?', ["Doesn't matter",'Mostly Straight','Some twists and turns','Twisties all day!'])
     show_state_routes = st.checkbox("Show a map of all the routes in your state")
     route_rec_button = st.form_submit_button('Get Routes!')
