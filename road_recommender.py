@@ -21,10 +21,10 @@ from helper import calc_row_sum, get_data
 # df = pd.read_csv(file_path)
 df = get_data('data/route_df.pkl')
 
-def create_model(n_neighbors=5):
+def create_model(n_neighbors=20):
     """Return trained NN model"""
 
-    numeric_features = ['route_length','state_prop_rank']
+    numeric_features = ['route_length','state_prop_rank','user_rating','sinuosity']
 
     # transformers
     numeric_transformer = Pipeline([
@@ -41,9 +41,9 @@ def create_model(n_neighbors=5):
     # preprocessor & pipe
     preprocessor = ColumnTransformer([
         ('route_engagement',engagement_transformer, ['num_user_reviews','num_users_rode','num_users_want2ride']),
-        ('scenery', description_transformer, 'scenery_description'),
-        ('drive_enjoyment', description_transformer, 'drive_enjoyment_description'),
-        ('tourism', description_transformer, 'tourism_description'),
+        # ('scenery', description_transformer, 'scenery_description'),
+        # ('drive_enjoyment', description_transformer, 'drive_enjoyment_description'),
+        # ('tourism', description_transformer, 'tourism_description'),
         ('state', OneHotEncoder(handle_unknown='ignore'), ['state']),
         ('numeric_features',numeric_transformer, numeric_features),
         ('locale','passthrough',['loc_lat','loc_lon'])

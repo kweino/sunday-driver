@@ -47,7 +47,9 @@ def get_route_coords(gpx_file_num):
 def display_route_info(rec_route,gpx):
 
     st.subheader(rec_route.name.values[0])
-
+    st.markdown(f'''
+        Need Directions? Download the [GPX file](https://www.motorcycleroads.com/downloadgpx/{gpx}).
+    ''')
     # route metrics
     route_len = round(rec_route.route_length.values[0])
     route_sin = round(rec_route.sinuosity.values[0],2)
