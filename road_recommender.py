@@ -28,7 +28,7 @@ def create_model(n_neighbors=20):
 
     # transformers
     numeric_transformer = Pipeline([
-        ("imputer", SimpleImputer(strategy="mean")), ("scaler", RobustScaler())
+        ("imputer", SimpleImputer(strategy="median")), ("scaler", RobustScaler())
     ])
 
     description_transformer = TfidfVectorizer(stop_words=STOP_WORDS,
@@ -56,11 +56,11 @@ def create_model(n_neighbors=20):
 
     return preprocessor.fit_transform(df), engine_pipe.fit(df)
 
-def get_recommendations(features, model,route_index):
+def get_recommendations(features, model,route_index,num_recs=5):
     n=route_index
     dists, indices = model[1].kneighbors(features[n])
     rec_routes = df.loc[indices[0]]
-    return rec_routes
+    return rec_routes.head(num_recs)
 
 
 if __name__ == '__main__':

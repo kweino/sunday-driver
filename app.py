@@ -10,7 +10,7 @@ import plotly.express as px
 
 from road_recommender import create_model, get_recommendations
 from comment_modeler import create_comment_model, get_main_topic_df
-from helper import get_data, write_data, get_plotting_zoom_level_and_center_coordinates_from_lonlat_tuples
+from helper import get_data, write_data, categorize_roads
 
 
 
@@ -33,6 +33,7 @@ if 'click_route_gpx' not in st.session_state:
 
 if 'click_route_button' not in st.session_state:
     st.session_state['click_route_button'] = False
+
 
 ##### Configurations #####
 st.set_page_config(layout="wide")
@@ -66,7 +67,8 @@ def display_route_info(rec_route,gpx):
                 f'{round(len_dif,1)} miles')
     met2.metric('Sinuosity',
                 route_sin,
-                f'{round(sin_dif,2)}%')
+                categorize_roads(route_sin),#f'{round(sin_dif,2)}%',
+                delta_color='off')
     met3.metric('MR.com User Rating',
                 user_rate,
                 f'{round(rate_dif,1)}%')
@@ -231,9 +233,15 @@ if route_rec_button:
 
 
         # recommend routes from engine based on road MR found above
-        recommended_roads = get_recommendations(features, model, closest_index)
+        recommended_roads = get_recommendations(features, model, closest_index,num_recs=num_routes_desired)
 
         # map those roads
+        try:
+            st.title(f"Great roads near {results[0]['components']['town']}, {results[0]['components']['state_code']}")
+        except:
+            pass
+        st.markdown('---')
+
         for gpx in recommended_roads.gpx_file_num:
             rec_route = df[df.gpx_file_num == gpx]
             display_route_info(rec_route,gpx)
@@ -293,7 +301,23 @@ elif data_story_button:
     video_bytes = video_file.read()
     st.video(video_bytes)
 
-    st.header('Analysis Steps:')
+    st.header('Analysis Journey:')
+    with st.expander('What is Sinuosity?'):
+        col1, col2 = st.columns(2)
+        col1.markdown(f'''
+            [Sinuosity](http://www.netmaptools.org/Pages/NetMapHelp/channel_sinuosity.htm) is a metric often used in classifying river segements.
+
+            It is calculated as the ratio of actual channel path length
+            divided by shortest path length.
+
+            The image below helps to give you some sense of scale for the metric
+            I calculated in the app. The average sinusosity of the roads in my
+            database is {round(df.sinuosity.mean(), 2)}.
+        ''')
+        col2.image('http://www.netmaptools.org/Pages/NetMapHelp/drex_channel_sinuosity_custom.png')
+        st.image('http://onlinemanuals.txdot.gov/txdotmanuals/hyd/images/Figure7-3.png')
+
+
     with st.expander('Initial Ridge Model'):
         st.markdown('''
             In my first model, I wanted to learn something about the website features of each route.
@@ -360,6 +384,7 @@ elif st.session_state.click_route_button == True:
     new_route_index = df[df.gpx_file_num == st.session_state.click_route_gpx].index[0]
     recommended_roads = get_recommendations(features, model, new_route_index)
 
+    st.title('Recommendations for roads related to')
     # map those roads
     for gpx in recommended_roads.gpx_file_num:
         new_rec_route = df[df.gpx_file_num == gpx]
@@ -377,5 +402,6 @@ else: #not (route_rec_button) or (all_routes_button) or (data_story_button):
 
         ---
     ''')
+
     rand_route = df.sample(1)
     display_route_info(rand_route, gpx=rand_route.gpx_file_num.values[0])
