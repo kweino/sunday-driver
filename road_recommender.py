@@ -56,7 +56,7 @@ def create_model(n_neighbors=20):
 
     return preprocessor.fit_transform(df), engine_pipe.fit(df)
 
-def get_recommendations(features, model,route_index,num_recs=5):
+def get_recommendations(features, model,route_index,num_recs=10):
     n=route_index
     dists, indices = model[1].kneighbors(features[n])
     rec_routes = df.loc[indices[0]]

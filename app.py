@@ -26,7 +26,12 @@ lda_model = get_data('data/models/lda_model.dill.gz')
 dictionary = get_data('data/models/dictionary.dill.gz')
 corpus = get_data('data/models/corpus.dill.gz')
 processed_text = get_data('data/models/processed_text.dill.gz')
-features, model = create_model()
+# features, model = create_model()
+# write_data(features,'data/models/recommender_features.dill.gz')
+# write_data(model,'data/models/recommender_model.dill.gz')
+
+features = get_data('data/models/recommender_features.dill.gz')
+model = get_data('data/models/recommender_model.dill.gz')
 
 if 'click_route_gpx' not in st.session_state:
     st.session_state['click_route_gpx'] = 0
