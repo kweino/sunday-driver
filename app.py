@@ -26,10 +26,8 @@ lda_model = get_data('data/models/lda_model.dill.gz')
 dictionary = get_data('data/models/dictionary.dill.gz')
 corpus = get_data('data/models/corpus.dill.gz')
 processed_text = get_data('data/models/processed_text.dill.gz')
-# features, model = create_model()
-# write_data(features,'data/models/recommender_features.dill.gz')
-# write_data(model,'data/models/recommender_model.dill.gz')
 
+#recommender features
 features = get_data('data/models/recommender_features.dill.gz')
 model = get_data('data/models/recommender_model.dill.gz')
 
@@ -398,7 +396,6 @@ elif st.session_state.click_route_button == True:
 
 ##### LANDING PAGE #####
 else: #not (route_rec_button) or (all_routes_button) or (data_story_button):
-    # st.write(route_gdf.route_length.sum()/2600000)
     st.title('Sunday Rider: A Motorcycle Road Recommendation Engine')
     st.markdown('''
         **Sunday Rider** provides recommendations for roads near a user's location
