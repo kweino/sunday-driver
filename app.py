@@ -12,24 +12,31 @@ from road_recommender import create_model, get_recommendations
 from comment_modeler import create_comment_model, get_main_topic_df
 from helper import get_data, write_data, categorize_roads
 
-
+##### Configurations #####
+st.set_page_config(layout="wide")
 
 ##### Data, Variables, Models #####
 
 geocode_key = st.secrets.GEOCODE_API_KEY
 
-df = get_data('data/route_df.pkl')
-route_gdf = get_data('data/route_gdf.pkl')
-route_marks_long = get_data('data/route_marks_long.pkl')
+@st.experimental_memo(suppress_st_warning=True)
+def load_datmods():
+    df = get_data('data/route_df.pkl')
+    route_gdf = get_data('data/route_gdf.pkl')
+    route_marks_long = get_data('data/route_marks_long.pkl')
+    #recommender features
+    features = get_data('data/models/recommender_features.dill.gz')
+    model = get_data('data/models/recommender_model.dill.gz')
+    return df, route_gdf, route_marks_long, features, model
 
-lda_model = get_data('data/models/lda_model.dill.gz')
-dictionary = get_data('data/models/dictionary.dill.gz')
-corpus = get_data('data/models/corpus.dill.gz')
-processed_text = get_data('data/models/processed_text.dill.gz')
+    # future features (not currently in use):
+    # lda_model = get_data('data/models/lda_model.dill.gz')
+    # dictionary = get_data('data/models/dictionary.dill.gz')
+    # corpus = get_data('data/models/corpus.dill.gz')
+    # processed_text = get_data('data/models/processed_text.dill.gz')
 
-#recommender features
-features = get_data('data/models/recommender_features.dill.gz')
-model = get_data('data/models/recommender_model.dill.gz')
+df, route_gdf, route_marks_long, features, model = load_datmods()
+
 
 if 'click_route_gpx' not in st.session_state:
     st.session_state['click_route_gpx'] = 0
@@ -38,16 +45,14 @@ if 'click_route_button' not in st.session_state:
     st.session_state['click_route_button'] = False
 
 
-##### Configurations #####
-st.set_page_config(layout="wide")
-
 ##### Functions to display various page elements #####
-
+@st.experimental_memo(suppress_st_warning=True,ttl=300)
 def get_route_coords(gpx_file_num):
     '''takes a gpx_file_num and returns a dataframe of the lat/lon points'''
     x,y = route_gdf[route_gdf.gpx_file_num == gpx_file_num].geometry.iloc[0].coords.xy
     return pd.DataFrame({'latitude':y,'longitude':x})
 
+@st.experimental_memo(suppress_st_warning=True,max_entries=3,ttl=300)
 def display_route_info(rec_route,gpx):
 
     st.subheader(rec_route.name.values[0])
@@ -117,7 +122,7 @@ def display_route_info(rec_route,gpx):
     # get new roads like the current one!
     # if new_route_rec_button:
     #     st.session_state.click_route_gpx = rec_route.name.values[0]
-
+@st.experimental_memo(suppress_st_warning=True,max_entries=1)
 def make_big_map(df,state=None):
     if state:
         geo_df = df[df.state == state].reset_index(drop=True)
@@ -158,25 +163,25 @@ def make_big_map(df,state=None):
     # fig.update_geos(fitbounds="locations")
     return fig
 
-def plot_topic_wordfreqs(lda_model, dictionary, corpus, processed_text):
-    main_topic_df = get_main_topic_df(lda_model, corpus, processed_text)
-    lda_top_words_index = set()
-    for i in range(lda_model.num_topics):
-        lda_top_words_index = lda_top_words_index.union([k for (k,v) in lda_model.get_topic_terms(i)])
-
-    #print('Indices of top words: \n{}\n'.format(lda_top_words_index))
-    words_we_care_about = [{dictionary[tup[0]]: tup[1] for tup in lst if tup[0] in lda_top_words_index}
-                           for lst in corpus]
-    lda_top_words_df = pd.DataFrame(words_we_care_about).fillna(0).astype(int).sort_index(axis=1)
-    lda_top_words_df['Cluster'] = main_topic_df['Dominant_topic']
-    word_freq_plot = (
-            lda_top_words_df
-            .groupby('Cluster').sum().transpose()
-            .plot.bar(figsize=(15, 5), width=0.7)
-            .set(ylabel='Word frequency',
-                 title=f'Word Frequencies by Topic, Combining the Top {len(lda_top_words_index)} Words in Each Topic')
-    )
-    return word_freq_plot
+# def plot_topic_wordfreqs(lda_model, dictionary, corpus, processed_text):
+#     main_topic_df = get_main_topic_df(lda_model, corpus, processed_text)
+#     lda_top_words_index = set()
+#     for i in range(lda_model.num_topics):
+#         lda_top_words_index = lda_top_words_index.union([k for (k,v) in lda_model.get_topic_terms(i)])
+#
+#     #print('Indices of top words: \n{}\n'.format(lda_top_words_index))
+#     words_we_care_about = [{dictionary[tup[0]]: tup[1] for tup in lst if tup[0] in lda_top_words_index}
+#                            for lst in corpus]
+#     lda_top_words_df = pd.DataFrame(words_we_care_about).fillna(0).astype(int).sort_index(axis=1)
+#     lda_top_words_df['Cluster'] = main_topic_df['Dominant_topic']
+#     word_freq_plot = (
+#             lda_top_words_df
+#             .groupby('Cluster').sum().transpose()
+#             .plot.bar(figsize=(15, 5), width=0.7)
+#             .set(ylabel='Word frequency',
+#                  title=f'Word Frequencies by Topic, Combining the Top {len(lda_top_words_index)} Words in Each Topic')
+#     )
+#     return word_freq_plot
 
 ############################# START OF PAGE #############################
 
