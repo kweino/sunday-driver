@@ -16,7 +16,7 @@ from helper import get_data, write_data, categorize_roads
 st.set_page_config(layout="wide")
 
 ##### Data, Variables, Models #####
-
+mapbox_key = st.secrets.MAPBOX_KEY
 geocode_key = st.secrets.GEOCODE_API_KEY
 
 @st.experimental_memo(suppress_st_warning=True)
@@ -92,7 +92,7 @@ def display_route_info(rec_route,gpx):
                          height=500)
     fig.update_traces(line={'width':4})
     # fig.update_geos(fitbounds="locations")
-    fig.update_layout(mapbox_style='streets', mapbox_accesstoken=st.secrets.MAPBOX_KEY)
+    fig.update_layout(mapbox_style='streets', mapbox_accesstoken=mapbox_key)
 
     st.plotly_chart(fig, use_container_width=True)
 
