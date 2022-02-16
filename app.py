@@ -17,7 +17,7 @@ st.set_page_config(layout="wide")
 
 from boto.s3.connection import S3Connection
 s3 = S3Connection(os.environ['GEOCODE_API_KEY'], os.environ['MAPBOX_KEY'])
-# sunday_rider_bucket = s3.create_bucket('sunday_rider_bucket')
+
 
 mapbox_key = os.environ['MAPBOX_KEY']
 geocode_key = os.environ['GEOCODE_API_KEY']
@@ -211,6 +211,16 @@ with st.sidebar.form(key='data_story_form'):
     st.write('Learn the story behind Sunday Rider')
     data_story_button = st.form_submit_button('Tell me more!')
 
+st.sidebar.markdown('''
+    ---
+    Sunday Rider was created by [Kevin Weingarten](https://www.linkedin.com/in/kevinweingarten/)
+    as part of a capstone project for The Data Incubator's
+    [Data Science Fellowship](https://www.thedataincubator.com/programs/data-science-fellowship/).
+
+    Check out Kevin's [GitHub page](https://github.com/kweino/).
+    ### Contact Kevin:
+    kevin.weingarten@mg.thedataincubator.com
+''')
 # st.title('LOOK HERE')
 # st.write(st.session_state.click_route_button, st.session_state.click_route_gpx)
 
@@ -417,3 +427,17 @@ else: #not (route_rec_button) or (all_routes_button) or (data_story_button):
 
     rand_route = df.sample(1)
     display_route_info(rand_route, gpx=rand_route.gpx_file_num.values[0])
+
+    # col1, col2 = st.columns(2)
+    # col1.image('https://49j61okv0x0x1zylscmgjqle-wpengine.netdna-ssl.com/wp-content/uploads/2019/03/motorcycle-rider.jpg')
+    # col2.image('https://www.allstate.com/resources/Allstate/images/tools-resources-articles/motorcycle/sunset-behind-motorcycle_GettyImages-680x402.jpg')
+    # col1, col2, col3 = st.columns(3)
+    # col2.title('Thank you!')
+    # st.markdown('''
+    #     ## Contact me:
+    #     ### kevin.weingarten@mg.thedataincubator.com
+    #
+    #     ## Check out the app for yourself:
+    #     ### https://sunday-rider.herokuapp.com/
+    #     ### https://share.streamlit.io/kweino/sunday-rider/app.py
+    # ''')
