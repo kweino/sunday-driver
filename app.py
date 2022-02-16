@@ -15,9 +15,14 @@ from helper import get_data, write_data, categorize_roads
 ##### Configurations #####
 st.set_page_config(layout="wide")
 
+from boto.s3.connection import S3Connection
+s3 = S3Connection(os.environ['GEOCODE_API_KEY'], os.environ['MAPBOX_KEY'])
+# sunday_rider_bucket = s3.create_bucket('sunday_rider_bucket')
+
+mapbox_key = os.environ['MAPBOX_KEY']
+geocode_key = os.environ['GEOCODE_API_KEY']
+
 ##### Data, Variables, Models #####
-mapbox_key = st.secrets.MAPBOX_KEY
-geocode_key = st.secrets.GEOCODE_API_KEY
 
 @st.experimental_memo(suppress_st_warning=True)
 def load_datmods():
