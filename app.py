@@ -208,7 +208,16 @@ with st.sidebar.form(key='data_story_form'):
 
 # st.title('LOOK HERE')
 # st.write(st.session_state.click_route_button, st.session_state.click_route_gpx)
+st.sidebar.markdown('''
+    ---
+    Sunday Rider was created by [Kevin Weingarten](https://www.linkedin.com/in/kevinweingarten/)
+    as part of a capstone project for The Data Incubator's
+    [Data Science Fellowship](https://www.thedataincubator.com/programs/data-science-fellowship/).
 
+    Check out Kevin's [GitHub page](https://github.com/kweino/).
+    ### Contact Kevin:
+    kevin.weingarten@mg.thedataincubator.com
+''')
 
 ##### ROUTE RECOMMENDER #####
 if route_rec_button:
