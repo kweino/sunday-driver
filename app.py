@@ -336,16 +336,14 @@ elif data_story_button:
 
 
     with st.expander('Initial Ridge Model'):
-        st.markdown('''
+        col1, col2 = st.columns(2)
+        col1.markdown('''
             In my first model, I wanted to learn something about the website features of each route.
             Since explicability of features was my main focus, I chose a simple ridge regression model that
             predicted the current average user rating for each route. The Ridge-Regression model
             included the features I scraped from MR.com as well as several custom features,
             including the route's sinuosity and distance from a national park site.
-            ''')
 
-        col1, col2 = st.columns(2)
-        col1.markdown('''
             In the end, the initial Ridge model only explained about 20-30% of the variance in
             user ratings, and the model suffered from severe overfitting with the inclusion of any text data.
             I think the poor performance of the model can be mostly attributed to the clustering of user ratings.
