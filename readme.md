@@ -1,7 +1,7 @@
 # Sunday Rider: A Motorcycle Road Recommendation Engine
 
 Check out Sunday Rider:
-https://sunday-rider.herokuapp.com/ or https://share.streamlit.io/kweino/sunday-rider/app.py
+https://kweino-sunday-rider-app-83lxpg.streamlitapp.com/
 
 Sunday Rider provides recommendations for roads near a user's location that are highly rated by motorcyclists. Users can search for routes based on their location and other ride experience preferences, and if they find a route they like, the app can recommend similar routes to the liked route. 
 
