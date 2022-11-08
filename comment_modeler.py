@@ -7,7 +7,7 @@ from spacy.lang.en.stop_words import STOP_WORDS
 from pprint import pprint
 from sklearn.feature_extraction.text import CountVectorizer
 import matplotlib.pyplot as plt
-from ipywidgets import interact, IntSlider
+# from ipywidgets import interact, IntSlider
 
 
 def create_comment_model():
